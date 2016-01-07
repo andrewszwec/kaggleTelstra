@@ -1,0 +1,27 @@
+##########################################################
+# Kaggle - Telstra Comp
+#
+# BUILD FAULT ANALYTIC RECORD
+#
+#
+##########################################################
+setwd("~/kaggle/telstra")
+
+
+step1 <- merge(training, event, by="id", all.x = TRUE, sort=TRUE) 
+
+##########################################################
+## Pivot log features
+##########################################################
+require(reshape2)
+
+feature.pivot <- dcast(feature, id ~ log_feature, fun.aggregate = sum, value.var = "volume") # 18,552 records
+write.csv(feature.pivot, file="~/kaggle/telstra/out/feature.pivot.csv")
+# id    feat1 feat2 feat3 ... 
+# 5022    1     3     45  ...
+feature.pivot$id <- as.factor(feature.pivot$id)
+
+feature.pivot.pca <- prcomp(feature.pivot[ , 2:length(feature.pivot)],
+                            center = TRUE,
+                            scale. = TRUE) 
+
